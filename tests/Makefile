@@ -28,7 +28,7 @@ ifeq ($(origin AR), default)
   AR = ar
 endif
 DEFINES +=
-INCLUDES += -I../src -Ivendor/cest
+INCLUDES += -I../src -I../vendor/cest
 FORCE_INCLUDE +=
 ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
 ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
@@ -75,8 +75,12 @@ endif
 GENERATED :=
 OBJECTS :=
 
-GENERATED += $(OBJDIR)/GreeterTest.o
-OBJECTS += $(OBJDIR)/GreeterTest.o
+GENERATED += $(OBJDIR)/Process.o
+GENERATED += $(OBJDIR)/Timer.o
+GENERATED += $(OBJDIR)/TimerTest.o
+OBJECTS += $(OBJDIR)/Process.o
+OBJECTS += $(OBJDIR)/Timer.o
+OBJECTS += $(OBJDIR)/TimerTest.o
 
 # Rules
 # #############################################
@@ -140,7 +144,13 @@ endif
 # File Rules
 # #############################################
 
-$(OBJDIR)/GreeterTest.o: GreeterTest.cpp
+$(OBJDIR)/Process.o: ../src/Process.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/Timer.o: ../src/Timer.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/TimerTest.o: TimerTest.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 

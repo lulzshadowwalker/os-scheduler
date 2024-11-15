@@ -73,7 +73,11 @@ endif
 GENERATED :=
 OBJECTS :=
 
+GENERATED += $(OBJDIR)/Process.o
+GENERATED += $(OBJDIR)/Timer.o
 GENERATED += $(OBJDIR)/main.o
+OBJECTS += $(OBJDIR)/Process.o
+OBJECTS += $(OBJDIR)/Timer.o
 OBJECTS += $(OBJDIR)/main.o
 
 # Rules
@@ -138,6 +142,12 @@ endif
 # File Rules
 # #############################################
 
+$(OBJDIR)/Process.o: Process.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/Timer.o: Timer.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/main.o: main.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"

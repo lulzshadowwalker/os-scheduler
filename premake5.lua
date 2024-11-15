@@ -32,8 +32,9 @@ project "tests"
    targetname(targetName)
    objdir "bin-obj/%{cfg.buildcfg}/%{prj.name}"
 
-   files { "tests/**.cpp" }
-   includedirs { "src", "%{prj.name}/vendor/cest" }
+   files { "tests/**.cpp", "src/**.cpp" }
+   removefiles { "src/main.cpp" }
+   includedirs { "src", "vendor/cest" }
    postbuildcommands { "%{cfg.buildtarget.relpath}" } --  NOTE: run the tests
 
    filter "configurations:Debug"

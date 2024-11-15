@@ -1,0 +1,12 @@
+#ifndef PROCCESS_STATE_HPP
+#define PROCCESS_STATE_HPP
+
+enum ProcessState {
+  NEW,
+  READY,
+  RUNNING,
+  WAITING,
+  TERMINATED,
+}; 
+
+#endif // PROCCESS_STATE_HPP
