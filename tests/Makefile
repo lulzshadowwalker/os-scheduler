@@ -28,7 +28,7 @@ ifeq ($(origin AR), default)
   AR = ar
 endif
 DEFINES +=
-INCLUDES +=
+INCLUDES += -I../src -Ivendor/cest
 FORCE_INCLUDE +=
 ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
 ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
@@ -44,16 +44,16 @@ define POSTBUILDCMDS
 endef
 
 ifeq ($(config),debug)
-TARGETDIR = ../bin/debug/scheduler
-TARGET = $(TARGETDIR)/application
-OBJDIR = ../bin-obj/debug/scheduler
+TARGETDIR = ../bin/debug/tests
+TARGET = $(TARGETDIR)/test
+OBJDIR = ../bin-obj/debug/tests
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -g
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -g -std=c++14
 
 else ifeq ($(config),release)
-TARGETDIR = ../bin/release/scheduler
-TARGET = $(TARGETDIR)/application
-OBJDIR = ../bin-obj/release/scheduler
+TARGETDIR = ../bin/release/tests
+TARGET = $(TARGETDIR)/test
+OBJDIR = ../bin-obj/release/tests
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O2
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -O2 -std=c++14
 
@@ -69,8 +69,8 @@ endif
 GENERATED :=
 OBJECTS :=
 
-GENERATED += $(OBJDIR)/main.o
-OBJECTS += $(OBJDIR)/main.o
+GENERATED += $(OBJDIR)/GreeterTest.o
+OBJECTS += $(OBJDIR)/GreeterTest.o
 
 # Rules
 # #############################################
@@ -80,7 +80,7 @@ all: $(TARGET)
 
 $(TARGET): $(GENERATED) $(OBJECTS) $(LDDEPS) | $(TARGETDIR)
 	$(PRELINKCMDS)
-	@echo Linking scheduler
+	@echo Linking tests
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 
@@ -101,7 +101,7 @@ else
 endif
 
 clean:
-	@echo Cleaning scheduler
+	@echo Cleaning tests
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(GENERATED)
@@ -134,7 +134,7 @@ endif
 # File Rules
 # #############################################
 
-$(OBJDIR)/main.o: main.cpp
+$(OBJDIR)/GreeterTest.o: GreeterTest.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 
