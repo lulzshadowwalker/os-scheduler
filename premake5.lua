@@ -14,6 +14,7 @@ project "scheduler"
 
    filter "configurations:Debug"
       symbols "On"
+      postbuildcommands { "%{cfg.buildtarget.relpath}" } --  NOTE: run the application
 
    filter "configurations:Release"
       optimize "On"
@@ -23,12 +24,17 @@ project "tests"
    location "tests/"
    language "C++"
    cppdialect "C++14"
-   targetdir "bin/%{cfg.buildcfg}/%{prj.name}"
-   targetname "test"
+
+   local targetDir =  "bin/%{cfg.buildcfg}/%{prj.name}"
+   local targetName =  "test"
+
+   targetdir(targetDir)
+   targetname(targetName)
    objdir "bin-obj/%{cfg.buildcfg}/%{prj.name}"
 
    files { "tests/**.cpp" }
    includedirs { "src", "%{prj.name}/vendor/cest" }
+   postbuildcommands { "%{cfg.buildtarget.relpath}" } --  NOTE: run the tests
 
    filter "configurations:Debug"
       symbols "On"
