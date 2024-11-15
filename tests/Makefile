@@ -76,11 +76,11 @@ GENERATED :=
 OBJECTS :=
 
 GENERATED += $(OBJDIR)/Process.o
+GENERATED += $(OBJDIR)/Test.o
 GENERATED += $(OBJDIR)/Timer.o
-GENERATED += $(OBJDIR)/TimerTest.o
 OBJECTS += $(OBJDIR)/Process.o
+OBJECTS += $(OBJDIR)/Test.o
 OBJECTS += $(OBJDIR)/Timer.o
-OBJECTS += $(OBJDIR)/TimerTest.o
 
 # Rules
 # #############################################
@@ -150,7 +150,7 @@ $(OBJDIR)/Process.o: ../src/Process.cpp
 $(OBJDIR)/Timer.o: ../src/Timer.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/TimerTest.o: TimerTest.cpp
+$(OBJDIR)/Test.o: Test.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 

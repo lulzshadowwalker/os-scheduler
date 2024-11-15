@@ -19,6 +19,13 @@ public:
   inline const Program* program() const { return m_Program; }
   inline Rank rank() const { return m_Rank; }
   inline Timestamp arrivedAt() const { return m_ArrivedAt; }
+  inline Time processingTime() const { return m_Program->processingTime(); }
+
+  inline Process& setArrivedAt(Timestamp arrivedAt) {
+    m_ArrivedAt = arrivedAt; 
+
+    return *this;
+  } 
 
 private:
   int m_Id;
