@@ -1,0 +1,1052 @@
+#pragma once
+#include <chrono>
+#include <csetjmp>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <csignal>
+#include <random>
+#include <iostream>
+#include <map>
+#include <vector>
+#include <functional>
+#include <fstream>
+#include <regex>
+#include <cmath>
+#include <cstring>
+
+
+namespace cest
+{
+  struct TestFunction
+  {
+    std::string file;
+    int line;
+    std::function<void()> fn;
+  };
+
+  enum class TestCaseCondition
+  {
+    Normal,
+    Skipped,
+    Focused
+  };
+
+  struct TestCase
+  {
+    std::string name;
+    TestCaseCondition condition;
+    TestFunction fn;
+    bool failed;
+    std::string failure_message;
+    std::string failure_file;
+    int failure_line;
+  };
+
+  struct TestSuite
+  {
+    std::string name;
+    TestFunction before_each;
+    TestFunction after_each;
+    TestFunction before_all;
+    TestFunction after_all;
+    std::vector<TestCase *> test_cases;
+    std::map<std::string, TestSuite *> test_suites;
+  };
+
+  class AssertionError : public std::exception
+  {
+  public:
+    std::string file;
+    int line;
+    std::string message;
+
+    AssertionError(std::string file, int line, std::string message) : file(file), line(line), message(message) {}
+  };
+
+  class ForcedPassError : public std::exception
+  {
+  };
+
+  struct CommandLineOptions
+  {
+    bool help;
+    bool randomize;
+    unsigned int random_seed;
+    bool random_seed_present;
+    bool generate_test_report;
+    bool only_test_suite_result;
+    bool tree_test_suite_result;
+  };
+
+  struct CestGlobals
+  {
+    TestSuite root_test_suite;
+    TestSuite *current_test_suite;
+    TestCase *current_test_case;
+    jmp_buf jump_env;
+
+    CestGlobals() : current_test_suite(nullptr) {}
+  };
+}
+
+// CEST-ONCE-START
+static cest::CestGlobals __cest_globals;
+// CEST-ONCE-END
+
+
+#define ASCII_BACKGROUND_GREEN "\u001b[42m"
+#define ASCII_BACKGROUND_YELLOW "\u001b[43m"
+#define ASCII_BACKGROUND_RED "\u001b[41m"
+#define ASCII_BACKGROUND_MAGENTA "\u001b[45;1m"
+#define ASCII_RED "\033[1m\033[31m"
+#define ASCII_GREEN "\033[1m\033[32m"
+#define ASCII_GRAY "\u001b[38;5;243m"
+#define ASCII_BLACK "\u001b[38;5;232m"
+#define ASCII_YELLOW "\u001b[33m"
+#define ASCII_BOLD "\u001b[1m"
+#define ASCII_RESET "\033[0m"
+#define ASCII_CROSS "\u2715"
+#define ASCII_CHECK "\u2713"
+#define ASCII_TRIANGLE "\u25CB"
+
+namespace cest
+{
+    void tryPrintFailedLines(cest::TestCase *test_case)
+  {
+    if (!test_case->failed) return;
+
+    std::ifstream file(test_case->failure_file);
+    if (!file.is_open()) return;
+
+    std::string line;
+    std::vector<std::string> lines;
+    int start_line = std::max(test_case->failure_line - 3, 0);
+    int end_line = start_line + 6;
+    int current_line = 0;
+
+    while (current_line < start_line && std::getline(file, line)) current_line++;
+
+    for (int i=start_line; i<=end_line && std::getline(file, line); ++i) lines.push_back(line);
+
+    int line_counter = start_line;
+    for (auto l : lines)
+    {
+      if (line_counter == test_case->failure_line)
+      {
+        std::cout << " " << ASCII_RED << ASCII_BOLD <<  "> " << line_counter << ASCII_RESET << ASCII_GRAY << " | " << ASCII_RESET;
+      }
+      else
+      {
+        std::cout << "   " << ASCII_GRAY << line_counter << " | " << ASCII_RESET;
+      }
+      std::cout << l << std::endl;
+      line_counter++;
+    }
+
+    file.close();
+  }
+
+  void showHelp(std::string binary)
+  {
+    std::cout << "usage: " << binary << " [options]" << std::endl
+              << std::endl;
+    std::cout << "Command line options:" << std::endl;
+    std::cout << "    -r/--randomize: Randomize test executions" << std::endl;
+    std::cout << "    -o/--only-suite-result: Only output the test suite result" << std::endl;
+    std::cout << "    -t/--tree-suite-result: Output the test suite result in tree format" << std::endl;
+    std::cout << "    -s/--seed <seed>: Inject seed for randomization uses (unsigned integer)";
+    std::cout << std::endl;
+  }
+
+  void printTestBadge(bool failed, bool skipped = false)
+  {
+    if (failed)
+    {
+      std::cout << ASCII_BACKGROUND_RED << ASCII_BLACK << ASCII_BOLD << " FAIL " << ASCII_RESET;
+    }
+    else if (skipped)
+    {
+      std::cout << ASCII_BACKGROUND_YELLOW << ASCII_BLACK << ASCII_BOLD << " SKIP " << ASCII_RESET;
+    }
+    else
+    {
+      std::cout << ASCII_BACKGROUND_GREEN << ASCII_BLACK << ASCII_BOLD << " PASS " << ASCII_RESET;
+    }
+  }
+
+  void printTestCaseResult(cest::TestCase *test_case)
+  {
+    printTestBadge(test_case->failed, test_case->condition == cest::TestCaseCondition::Skipped);
+    std::cout << ASCII_GRAY << " " << test_case->fn.file << ":" << test_case->fn.line << ASCII_RESET << ASCII_BOLD << " " << test_case->name << ASCII_RESET << std::endl;
+
+    if (test_case->failed)
+    {
+      std::cout << " Failed at line " << test_case->failure_line << ": " << test_case->failure_message << std::endl;
+      tryPrintFailedLines(test_case);
+    }
+  }
+
+  void printTestSuiteResult(cest::TestSuite *suite)
+  {
+    for (cest::TestCase *test_case : suite->test_cases)
+      printTestCaseResult(test_case);
+
+    for (auto &pair : suite->test_suites)
+      printTestSuiteResult(pair.second);
+  }
+
+  void printSingleSuiteSummaryResult(cest::TestSuite *suite)
+  {
+    bool any_test_failed = false;
+
+    for (cest::TestCase *test_case : suite->test_cases)
+    {
+      if (test_case->failed)
+      {
+        any_test_failed = true;
+        break;
+      }
+    }
+
+    printTestBadge(any_test_failed);
+
+    std::cout << ASCII_BOLD << " " << suite->test_cases[0]->fn.file << ASCII_RESET << std::endl;
+  }
+
+  void printTreeSuiteResult(cest::TestSuite *suite, int indentation = 0)
+  {
+    std::string spacing = "  ";
+
+    for (int i = 0; i < indentation; ++i)
+      spacing += "  ";
+
+    std::cout << spacing << ASCII_BOLD << suite->name << ASCII_RESET << std::endl;
+
+    for (cest::TestCase *test_case : suite->test_cases)
+    {
+      if (test_case->failed)
+        std::cout << "  " << spacing << ASCII_RED << ASCII_CROSS << ASCII_RESET;
+      else if (test_case->condition == cest::TestCaseCondition::Skipped)
+        std::cout << "  " << spacing << ASCII_YELLOW << ASCII_TRIANGLE << ASCII_RESET;
+      else
+        std::cout << "  " << spacing << ASCII_GREEN << ASCII_CHECK << ASCII_RESET;
+
+      std::cout << " " << ASCII_GRAY << test_case->name << ASCII_RESET << std::endl;
+
+      if (test_case->failed)
+      {
+        std::cout << "   Failed at line " << test_case->failure_line << ": " << test_case->failure_message << std::endl;
+        tryPrintFailedLines(test_case);
+      }
+    }
+
+    for (auto &pair : suite->test_suites)
+      printTreeSuiteResult(pair.second, indentation + 1);
+  }
+
+  void printSuiteSummaryResult(cest::TestSuite *suite)
+  {
+    printSingleSuiteSummaryResult(suite);
+
+    for (auto &pair : suite->test_suites)
+      printSuiteSummaryResult(pair.second);
+  }
+}
+
+
+namespace cest
+{
+  CommandLineOptions parseArgs(int argc, const char *argv[])
+  {
+    CommandLineOptions options = {0};
+
+    if (argc > 1)
+    {
+      for (int i = 0; i < argc; ++i)
+      {
+        if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0)
+        {
+          options.help = true;
+        }
+
+        if (strcmp(argv[i], "-r") == 0 || strcmp(argv[i], "--randomize") == 0)
+        {
+          options.randomize = true;
+        }
+
+        if (strcmp(argv[i], "-p") == 0 || strcmp(argv[i], "--report") == 0)
+        {
+          options.generate_test_report = true;
+        }
+
+        if (strcmp(argv[i], "-o") == 0 || strcmp(argv[i], "--only-suite-result") == 0)
+        {
+          options.only_test_suite_result = true;
+        }
+
+        if (strcmp(argv[i], "-t") == 0 || strcmp(argv[i], "--tree-suite-result") == 0)
+        {
+          options.tree_test_suite_result = true;
+        }
+
+        if (strcmp(argv[i], "-s") == 0 || strcmp(argv[i], "--seed") == 0)
+        {
+          if (i + 1 < argc)
+          {
+            try
+            {
+              options.random_seed = std::stoi(argv[i + 1]);
+              options.random_seed_present = true;
+            }
+            catch (const std::invalid_argument &err)
+            {
+              std::cout << "Invalid seed value: " << argv[i + 1] << std::endl;
+            }
+          }
+        }
+      }
+    }
+
+    return options;
+  }
+}
+
+
+namespace cest
+{
+  template <class T>
+  class Parameter
+  {
+  public:
+    Parameter() {}
+
+    Parameter<T> withValue(T v)
+    {
+      values.push_back(v);
+      return *this;
+    }
+
+    void thenDo(std::function<void(T)> call)
+    {
+      for (T v : values)
+        call(v);
+    }
+
+  private:
+    std::vector<T> values;
+  };
+
+  template <class T>
+  Parameter<T> withParameter()
+  {
+    return Parameter<T>();
+  }
+}
+
+#define describe(...) __attribute__((unused)) static int dummy = cest::describeFn(__VA_ARGS__)
+#define it(...) cest::itFn(__FILE__, __LINE__, __VA_ARGS__)
+#define xit(...) cest::xitFn(__FILE__, __LINE__, __VA_ARGS__)
+#define fit(...) cest::fitFn(__FILE__, __LINE__, __VA_ARGS__)
+#define beforeEach(x) cest::beforeEachFn(__FILE__, __LINE__, x)
+#define afterEach(x) cest::afterEachFn(__FILE__, __LINE__, x)
+#define beforeAll(x) cest::beforeAllFn(__FILE__, __LINE__, x)
+#define afterAll(x) cest::afterAllFn(__FILE__, __LINE__, x)
+
+namespace cest
+{
+  class TestCaseBuilder
+  {
+  private:
+    TestCase *test;
+
+  public:
+    TestCaseBuilder(std::string file, int line, std::string name, std::function<void()> fn)
+    {
+      test = new TestCase();
+      test->name = name;
+      test->condition = TestCaseCondition::Normal;
+      test->fn.file = file;
+      test->fn.line = line;
+      test->fn.fn = fn;
+      test->failed = false;
+    }
+
+    TestCaseBuilder *skipped()
+    {
+      test->condition = TestCaseCondition::Skipped;
+      return this;
+    }
+
+    TestCaseBuilder *Focused()
+    {
+      test->condition = TestCaseCondition::Focused;
+      return this;
+    }
+
+    TestCase *build()
+    {
+      return test;
+    }
+  };
+
+  int describeFn(std::string name, std::function<void()> fn)
+  {
+    if (__cest_globals.current_test_suite == nullptr)
+    {
+      __cest_globals.current_test_suite = &__cest_globals.root_test_suite;
+    }
+    else
+    {
+      TestSuite *new_suite = new TestSuite();
+      __cest_globals.current_test_suite->test_suites[name] = new_suite;
+      __cest_globals.current_test_suite = new_suite;
+    }
+
+    __cest_globals.current_test_suite->name = name;
+
+    fn();
+
+    return 0;
+  }
+
+  void itFn(std::string file, int line, std::string name, std::function<void()> fn)
+  {
+    TestCase *test = TestCaseBuilder(file, line, name, fn).build();
+    __cest_globals.current_test_suite->test_cases.push_back(test);
+  }
+
+  void fitFn(std::string file, int line, std::string name, std::function<void()> fn)
+  {
+    TestCase *test = TestCaseBuilder(file, line, name, fn).Focused()->build();
+    __cest_globals.current_test_suite->test_cases.push_back(test);
+  }
+
+  void xitFn(std::string file, int line, std::string name, std::function<void()> fn)
+  {
+    TestCase *test = TestCaseBuilder(file, line, name, fn).skipped()->build();
+    __cest_globals.current_test_suite->test_cases.push_back(test);
+  }
+
+  void beforeEachFn(std::string file, int line, std::function<void()> fn)
+  {
+    __cest_globals.current_test_suite->before_each = { file, line, fn};
+  }
+
+  void afterEachFn(std::string file, int line, std::function<void()> fn)
+  {
+    __cest_globals.current_test_suite->after_each = { file, line, fn};
+  }
+
+  void beforeAllFn(std::string file, int line, std::function<void()> fn)
+  {
+    __cest_globals.current_test_suite->before_all = { file, line, fn};
+  }
+
+  void afterAllFn(std::string file, int line, std::function<void()> fn)
+  {
+    __cest_globals.current_test_suite->after_all = { file, line, fn};
+  }
+}
+
+
+
+namespace cest
+{
+  void onSignalRaised(int sig)
+  {
+    std::string signal_as_string(strsignal(sig));
+    cest::TestCase *test_case = __cest_globals.current_test_case;
+
+    test_case->failed = true;
+    test_case->failure_message = signal_as_string;
+    test_case->failure_file = test_case->fn.file;
+    test_case->failure_line = test_case->fn.line;
+
+    longjmp(__cest_globals.jump_env, 1);
+  }
+
+  void configureSignals()
+  {
+    signal(SIGSEGV, cest::onSignalRaised);
+    signal(SIGFPE, cest::onSignalRaised);
+    signal(SIGBUS, cest::onSignalRaised);
+    signal(SIGILL, cest::onSignalRaised);
+    signal(SIGTERM, cest::onSignalRaised);
+    signal(SIGXCPU, cest::onSignalRaised);
+    signal(SIGXFSZ, cest::onSignalRaised);
+  }
+
+  void registerSignalHandler()
+  {
+    setjmp(__cest_globals.jump_env);
+  }
+}
+
+namespace cest
+{
+  void handleFailedTest(cest::TestCase *test_case, std::string message, std::string file, int line)
+  {
+    test_case->failed = true;
+    test_case->failure_message = message;
+    test_case->failure_file = file;
+    test_case->failure_line = line;
+  }
+
+  void runTestSuite(TestSuite *suite)
+  {
+    if (suite->before_all.fn)
+      suite->before_all.fn();
+
+    for (cest::TestCase *test_case : suite->test_cases)
+    {
+      if (test_case->condition == cest::TestCaseCondition::Skipped)
+        continue;
+
+      __cest_globals.current_test_case = test_case;
+
+      if (suite->before_each.fn)
+        suite->before_each.fn();
+
+      try
+      {
+        if (test_case->condition == cest::TestCaseCondition::Skipped)
+          throw cest::ForcedPassError();
+
+        test_case->fn.fn();
+        cest::registerSignalHandler();
+      }
+      catch (const cest::AssertionError &error)
+      {
+        handleFailedTest(test_case, error.message, error.file, error.line);
+      }
+      catch (const cest::ForcedPassError &error)
+      {
+      }
+      catch (const std::exception &error)
+      {
+        std::string message = "Unhandled exception: ";
+        message += error.what();
+        handleFailedTest(test_case, message, test_case->fn.file, test_case->fn.line);
+      }
+      catch (...)
+      {
+        std::string message = "Unhandled exception, non recoverable exception.";
+        handleFailedTest(test_case, message, test_case->fn.file, test_case->fn.line);
+      }
+
+      if (suite->after_each.fn)
+        suite->after_each.fn();
+    }
+
+    if (suite->after_all.fn)
+      suite->after_all.fn();
+
+    for (auto &pair : suite->test_suites)
+      runTestSuite(pair.second);
+  }
+}
+
+
+#define CLIP_STRING_LENGTH 16
+
+#define expect(...) cest::expectFunction(__FILE__, __LINE__, __VA_ARGS__)
+#define passTest() cest::forcedPass()
+#define failTest() cest::forcedFailure(__FILE__, __LINE__)
+#define Regex(x) x, std::regex(x)
+
+namespace cest
+{
+  void forcedPass()
+  {
+    throw ForcedPassError();
+  }
+
+  void forcedFailure(std::string file, int line)
+  {
+    throw AssertionError(file, line, "Test failure forced manually");
+  }
+
+  template <class T>
+  void assertRaises(std::function<void()> expression)
+  {
+    std::string file = __cest_globals.current_test_case->fn.file;
+    int line = __cest_globals.current_test_case->fn.line;
+
+    try
+    {
+      expression();
+    }
+    catch (const T &err)
+    {
+      return;
+    }
+
+    throw AssertionError(file, line, "Expected exception not raised");
+  }
+
+  template <class T>
+  class Assertion
+  {
+  public:
+    Assertion(const char *file, int line, T value)
+    {
+      actual = value;
+      assertion_file = std::string(file);
+      assertion_line = line;
+    }
+
+    void toBeTruthy()
+    {
+      if (!actual)
+        throw AssertionError(assertion_file, assertion_line, "Expresion is not truthy");
+    }
+
+    void toBeFalsy()
+    {
+      if (actual)
+        throw AssertionError(assertion_file, assertion_line, "Expresion is not falsy");
+    }
+
+    void toBe(T expected)
+    {
+      if (expected != actual)
+      {
+
+        std::stringstream message;
+        message << "Expected " << expected << ", was " << actual;
+        throw AssertionError(assertion_file, assertion_line, message.str());
+      }
+    }
+
+    void toEqual(T expected)
+    {
+      toBe(expected);
+    }
+
+    void toEqualMemory(T expected, int64_t length)
+    {
+      int i;
+
+      for (i = 0; i < length; ++i)
+      {
+        if (expected[i] != actual[i])
+        {
+          std::stringstream message;
+          message << "Memory mismatch at byte " << i << ", expected ";
+          message << std::hex << std::uppercase << (int)expected[i] << " but was " << std::hex << std::uppercase << (int)actual[i];
+          throw AssertionError(assertion_file, assertion_line, message.str());
+        }
+      }
+    }
+
+    void toBeNotNull()
+    {
+      if (actual == NULL)
+      {
+        std::stringstream message;
+        message << "Expected 0x" << std::hex << std::uppercase << actual << " to be not null";
+        throw AssertionError(assertion_file, assertion_line, message.str());
+      }
+    }
+
+    void toBeNull()
+    {
+      if (actual != NULL)
+      {
+        std::stringstream message;
+        message << "Expected 0x" << std::hex << std::uppercase << actual << " to be null";
+        throw AssertionError(assertion_file, assertion_line, message.str());
+      }
+    }
+
+  private:
+    T actual;
+    std::string assertion_file;
+    int assertion_line;
+  };
+
+  template <>
+  class Assertion<double>
+  {
+  public:
+    Assertion(const char *file, int line, double value)
+    {
+      actual = value;
+      assertion_file = std::string(file);
+      assertion_line = line;
+    }
+
+    void toBe(double expected, double epsilon = 0.0000001)
+    {
+      if (fabs(actual - expected) > epsilon)
+      {
+        std::stringstream message;
+        message << "Expected " << expected << ", was " << actual;
+        throw AssertionError(assertion_file, assertion_line, message.str());
+      }
+    }
+
+    void toEqual(double expected, double epsilon = 0.0000001)
+    {
+      toBe(expected, epsilon);
+    }
+
+    void toBeGreaterThan(double expected)
+    {
+      if (actual < expected)
+      {
+        std::stringstream message;
+        message << "Expected " << expected << " to be greather than" << actual;
+        throw AssertionError(assertion_file, assertion_line, message.str());
+      }
+    }
+
+    void toBeLessThan(double expected)
+    {
+      if (actual > expected)
+      {
+        std::stringstream message;
+        message << "Expected " << expected << " to be less than" << actual;
+        throw AssertionError(assertion_file, assertion_line, message.str());
+      }
+    }
+
+  private:
+    double actual;
+    std::string assertion_file;
+    int assertion_line;
+  };
+
+  template <>
+  class Assertion<float>
+  {
+  public:
+    Assertion(const char *file, int line, float value)
+    {
+      actual = value;
+      assertion_file = std::string(file);
+      assertion_line = line;
+    }
+
+    void toBe(float expected, float epsilon = 0.00001f)
+    {
+      if (fabs(actual - expected) > epsilon)
+      {
+        std::stringstream message;
+        message << "Expected " << expected << ", was " << actual;
+        throw AssertionError(assertion_file, assertion_line, message.str());
+      }
+    }
+
+    void toEqual(float expected, float epsilon = 0.00001f)
+    {
+      toBe(expected, epsilon);
+    }
+
+    void toBeGreaterThan(float expected)
+    {
+      if (actual < expected)
+      {
+        std::stringstream message;
+        message << "Expected " << expected << " to be greather than" << actual;
+        throw AssertionError(assertion_file, assertion_line, message.str());
+      }
+    }
+
+    void toBeLessThan(float expected)
+    {
+      if (actual > expected)
+      {
+        std::stringstream message;
+        message << "Expected " << expected << " to be less than" << actual;
+        throw AssertionError(assertion_file, assertion_line, message.str());
+      }
+    }
+
+  private:
+    float actual;
+    std::string assertion_file;
+    int assertion_line;
+  };
+
+  template <class T>
+  class Assertion<std::vector<T>>
+  {
+  public:
+    Assertion(const char *file, int line, std::vector<T> value)
+    {
+      actual = value;
+      assertion_file = std::string(file);
+      assertion_line = line;
+    }
+
+    void toBe(std::vector<T> expected)
+    {
+      if (expected.size() != actual.size())
+      {
+        std::stringstream message;
+        message << "Vector sizes do not match, expected " << expected.size() << " items but had " << actual.size() << " items";
+        throw AssertionError(assertion_file, assertion_line, message.str());
+      }
+
+      for (size_t i = 0; i < expected.size(); ++i)
+      {
+        if (expected[i] != actual[i])
+        {
+          std::stringstream message;
+          message << "Vector item mismatch at position " << i << ", expected " << expected[i] << " but was " << actual[i];
+          throw AssertionError(assertion_file, assertion_line, message.str());
+        }
+      }
+    }
+
+    void toEqual(std::vector<T> expected)
+    {
+      toBe(expected);
+    }
+
+    void toContain(T item)
+    {
+      bool found = false;
+
+      for (size_t i = 0; i < actual.size(); ++i)
+      {
+        if (actual[i] == item)
+        {
+          found = true;
+          break;
+        }
+      }
+
+      if (!found)
+      {
+        std::stringstream message;
+        message << "Item " << item << " not found in vector";
+        throw AssertionError(assertion_file, assertion_line, message.str());
+      }
+    }
+
+    void toHaveLength(size_t size)
+    {
+      if (actual.size() != size)
+      {
+        std::stringstream message;
+        message << "Vector sizes does not match, expected " << size << " items but had " << actual.size() << " items";
+        throw AssertionError(assertion_file, assertion_line, message.str());
+      }
+    }
+
+  private:
+    std::vector<T> actual;
+    std::string assertion_file;
+    int assertion_line;
+  };
+
+  template <>
+  class Assertion<std::string>
+  {
+  public:
+    Assertion(const char *file, int line, std::string value)
+    {
+      actual = value;
+      assertion_file = std::string(file);
+      assertion_line = line;
+    }
+
+    void toBe(std::string expected)
+    {
+      if (expected != actual)
+      {
+        std::stringstream message;
+
+        if (expected.size() > CLIP_STRING_LENGTH || actual.size() > CLIP_STRING_LENGTH)
+        {
+          message << "String mismatch," << std::endl;
+          message << "  Expected: \"" << expected << "\"" << std::endl;
+          message << "  Actual  : \"" << actual << "\"";
+        }
+        else
+        {
+          message << "Expected \"" << expected << "\", was \"" << actual << "\"";
+        }
+
+        throw AssertionError(assertion_file, assertion_line, message.str());
+      }
+    }
+
+    void toMatch(std::string expected)
+    {
+      toContain(expected);
+    }
+
+    void toMatch(std::string expected_string, std::regex expected)
+    {
+      if (!std::regex_search(actual, expected))
+      {
+        std::stringstream message;
+        if (expected_string.size() > CLIP_STRING_LENGTH || actual.size() > CLIP_STRING_LENGTH)
+        {
+          message << "Expected pattern mismatch," << std::endl;
+          message << "  Regexp: \"" << expected_string << "\"" << std::endl;
+          message << "  Actual: \"" << actual << "\"";
+        }
+        else
+        {
+          message << "Expected pattern \"" << expected_string << "\" did not match with \"" << actual << "\"";
+        }
+
+        throw AssertionError(assertion_file, assertion_line, message.str());
+      }
+    }
+
+    void toEqual(std::string expected)
+    {
+      toBe(expected);
+    }
+
+    void toContain(std::string expected)
+    {
+      if (actual.find(expected) == std::string::npos)
+      {
+        std::stringstream message;
+
+        if (expected.size() > CLIP_STRING_LENGTH || actual.size() > CLIP_STRING_LENGTH)
+        {
+          message << "Substring not found," << std::endl;
+          message << "  Expected: \"" << expected << "\"" << std::endl;
+          message << "  Actual  : \"" << actual << "\"";
+        }
+        else
+        {
+          message << "\"" << expected << "\" not present inside \"" << actual << "\"";
+        }
+
+        throw AssertionError(assertion_file, assertion_line, message.str());
+      }
+    }
+
+    void toHaveLength(size_t length)
+    {
+      if (actual.length() != length)
+      {
+        std::stringstream message;
+        message << "Length of \"" << actual << "\" expected to be " << length << ", was " << actual.length();
+        throw AssertionError(assertion_file, assertion_line, message.str());
+      }
+    }
+
+  private:
+    std::string actual;
+    std::string assertion_file;
+
+    int assertion_line;
+  };
+
+  template <class T>
+  Assertion<T> expectFunction(const char *file, int line, T actual)
+  {
+    return Assertion<T>(file, line, actual);
+  }
+
+  Assertion<bool> expectFunction(const char *file, int line, bool actual)
+  {
+    return Assertion<bool>(file, line, actual);
+  }
+
+  Assertion<int64_t> expectFunction(const char *file, int line, int64_t actual)
+  {
+    return Assertion<int64_t>(file, line, actual);
+  }
+
+  Assertion<std::string> expectFunction(const char *file, int line, std::string actual)
+  {
+    return Assertion<std::string>(file, line, actual);
+  }
+
+  Assertion<std::string> expectFunction(const char *file, int line, const char *actual)
+  {
+    return Assertion<std::string>(file, line, (std::string)actual);
+  }
+}
+
+
+namespace cest
+{
+  void defaultRandomFn(int seed, cest::TestSuite *suite)
+  {
+    auto engine = std::default_random_engine(seed);
+    std::shuffle(suite->test_cases.begin(), suite->test_cases.end(), engine);
+  }
+
+  void randomizeTests(TestSuite *suite, int seed, std::function<void(int, cest::TestSuite *)> random_fn)
+  {
+    random_fn(seed, suite);
+
+    for (auto &pair : suite->test_suites)
+      randomizeTests(pair.second, seed, random_fn);
+  }
+}
+
+namespace cest
+{
+  void configureFocusedTestSuite(cest::TestSuite *test_suite)
+  {
+    int focused_test_idx = -1;
+
+    for (int i = 0; i < (int)test_suite->test_cases.size(); i++)
+    {
+      cest::TestCase *test_case = test_suite->test_cases[i];
+      if (test_case->condition == cest::TestCaseCondition::Focused)
+      {
+        focused_test_idx = i;
+        break;
+      }
+    }
+
+    if (focused_test_idx != -1)
+    {
+      for (int i = 0; i < (int)test_suite->test_cases.size(); i++)
+      {
+        cest::TestCase *test_case = test_suite->test_cases[i];
+
+        if (i != focused_test_idx)
+          test_case->condition = cest::TestCaseCondition::Skipped;
+      }
+    }
+
+    for (auto &pair : test_suite->test_suites)
+      configureFocusedTestSuite(pair.second);
+  }
+}
+
+int main(int argc, const char *argv[])
+{
+  cest::configureSignals();
+  cest::TestSuite *root_suite = &__cest_globals.root_test_suite;
+
+  cest::CommandLineOptions command_line_options = cest::parseArgs(argc, argv);
+  if (command_line_options.help)
+  {
+    cest::showHelp(argv[0]);
+    return 0;
+  }
+
+  if (command_line_options.randomize)
+  {
+    int seed = command_line_options.random_seed_present ? command_line_options.random_seed : std::chrono::system_clock::now().time_since_epoch().count();
+    cest::randomizeTests(root_suite, seed, cest::defaultRandomFn);
+  }
+
+  cest::configureFocusedTestSuite(root_suite);
+  cest::runTestSuite(root_suite);
+
+  if (command_line_options.only_test_suite_result)
+    cest::printSuiteSummaryResult(root_suite);
+  else if (command_line_options.tree_test_suite_result)
+    cest::printTreeSuiteResult(root_suite);
+  else
+    cest::printTestSuiteResult(root_suite);
+
+  return 0;
+}
