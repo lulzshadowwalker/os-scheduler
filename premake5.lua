@@ -14,6 +14,7 @@ project "scheduler"
 
    filter "configurations:Debug"
       symbols "On"
+      defines { "DEBUG" }
       postbuildcommands { "%{cfg.buildtarget.relpath}" } --  NOTE: run the application
 
    filter "configurations:Release"
@@ -38,6 +39,7 @@ project "tests"
    postbuildcommands { "%{cfg.buildtarget.relpath}" } --  NOTE: run the tests
 
    filter "configurations:Debug"
+      defines { "DEBUG" }
       symbols "On"
 
    filter "configurations:Release"

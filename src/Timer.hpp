@@ -1,37 +1,25 @@
 #ifndef TIMER_HPP
 #define TIMER_HPP
 
-#include <ctime>
-
 using Timestamp = int;
 
-class Timer {
-
+class Timer
+{
 public:
-  Timer();
+    /**
+     * Waits for the next tick.
+     */
+    virtual void tick() = 0;
 
-  /**
-   * Waits for the next tick (One second).
-   */
-  void tick();
+    /**
+     * Returns the time since the timer device has started.
+     */
+    virtual Timestamp time() const = 0;
 
-  /**
-   * Returns the time in seconds since the timer device has started.
-   */
-  Timestamp time() const;
-
-private:
-  /**
-   * The time when the timer was started.
-   */
-  time_t m_StartedAt;
-
-  inline time_t now() const { return std::time(nullptr); }
-
-  /**
-   * Returns the difference between two timestamps in seconds (Timestamp).
-   */
-  Timestamp diff(time_t a, time_t b) const;
+    inline Timestamp diff(time_t last, time_t first) const
+    {
+        return static_cast<int>(std::difftime(last, first));
+    }
 };
 
 #endif // TIMER_HPP

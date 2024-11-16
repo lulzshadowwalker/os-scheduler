@@ -27,7 +27,6 @@ endif
 ifeq ($(origin AR), default)
   AR = ar
 endif
-DEFINES +=
 INCLUDES += -I../src -I../vendor/cest
 FORCE_INCLUDE +=
 ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
@@ -45,6 +44,7 @@ ifeq ($(config),debug)
 TARGETDIR = ../bin/debug/tests
 TARGET = $(TARGETDIR)/test
 OBJDIR = ../bin-obj/debug/tests
+DEFINES += -DDEBUG
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -g
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -g -std=c++14
 define POSTBUILDCMDS
@@ -56,6 +56,7 @@ else ifeq ($(config),release)
 TARGETDIR = ../bin/release/tests
 TARGET = $(TARGETDIR)/test
 OBJDIR = ../bin-obj/release/tests
+DEFINES +=
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O2
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -O2 -std=c++14
 define POSTBUILDCMDS
@@ -75,12 +76,16 @@ endif
 GENERATED :=
 OBJECTS :=
 
+GENERATED += $(OBJDIR)/Os.o
 GENERATED += $(OBJDIR)/Process.o
+GENERATED += $(OBJDIR)/RankingScheduler.o
+GENERATED += $(OBJDIR)/RealTimeTimer.o
 GENERATED += $(OBJDIR)/Test.o
-GENERATED += $(OBJDIR)/Timer.o
+OBJECTS += $(OBJDIR)/Os.o
 OBJECTS += $(OBJDIR)/Process.o
+OBJECTS += $(OBJDIR)/RankingScheduler.o
+OBJECTS += $(OBJDIR)/RealTimeTimer.o
 OBJECTS += $(OBJDIR)/Test.o
-OBJECTS += $(OBJDIR)/Timer.o
 
 # Rules
 # #############################################
@@ -144,10 +149,16 @@ endif
 # File Rules
 # #############################################
 
+$(OBJDIR)/Os.o: ../src/Os.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/Process.o: ../src/Process.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/Timer.o: ../src/Timer.cpp
+$(OBJDIR)/RankingScheduler.o: ../src/RankingScheduler.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/RealTimeTimer.o: ../src/RealTimeTimer.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/Test.o: Test.cpp

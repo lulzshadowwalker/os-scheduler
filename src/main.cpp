@@ -3,24 +3,36 @@
 
 #include "Os.hpp"
 #include "ProcessFileParser.hpp"
-#include <fstream>
+#include "RankingScheduler.hpp"
 #include <iostream>
 #include <string>
+#include "RealTimeTimer.hpp"
 
-int main() {
-  Program powerpoint("powerpoint", 5);
+int main()
+{
+  std::vector<Process *> processes;
+  try
+  {
+    ProcessFileParser parser;
+    processes = parser.parse("../assets/samples/in.txt");
+  }
+  catch (const std::runtime_error &e)
+  {
+    std::cerr << e.what() << std::endl;
+    return 1;
+  }
+  catch (...)
+  {
+    std::cerr << "Error: An unexpected error occurred.\n";
+    return 1;
+  }
 
-  std::cout << "Program: " << powerpoint.name() << " Processing Time: " << powerpoint.processingTime() << std::endl;
+  auto timer = new RealTimeTimer();
 
-  auto process = new Process(&powerpoint, 10);
-  Os os { process };
+  auto scheduler = new RankingScheduler(timer);
+  Os os(scheduler, timer, processes);
 
-  std::cout << "Process: " << process->id() << std::endl;
-
-  ProcessFileParser parser; 
-  auto processes = parser.parse("/Users/lulz/dev/os-scheduler/assets/samples/in.txt");
-
-  std::cout << "Processes Count: " << processes.size() << std::endl;
+  os.run();
 
   return 0;
 }

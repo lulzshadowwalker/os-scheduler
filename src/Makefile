@@ -27,7 +27,6 @@ endif
 ifeq ($(origin AR), default)
   AR = ar
 endif
-DEFINES +=
 INCLUDES +=
 FORCE_INCLUDE +=
 ALL_CPPFLAGS += $(CPPFLAGS) -MD -MP $(DEFINES) $(INCLUDES)
@@ -45,6 +44,7 @@ ifeq ($(config),debug)
 TARGETDIR = ../bin/debug/scheduler
 TARGET = $(TARGETDIR)/application
 OBJDIR = ../bin-obj/debug/scheduler
+DEFINES += -DDEBUG
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -g
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -g -std=c++14
 define POSTBUILDCMDS
@@ -56,6 +56,7 @@ else ifeq ($(config),release)
 TARGETDIR = ../bin/release/scheduler
 TARGET = $(TARGETDIR)/application
 OBJDIR = ../bin-obj/release/scheduler
+DEFINES +=
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O2
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -O2 -std=c++14
 define POSTBUILDCMDS
@@ -73,11 +74,15 @@ endif
 GENERATED :=
 OBJECTS :=
 
+GENERATED += $(OBJDIR)/Os.o
 GENERATED += $(OBJDIR)/Process.o
-GENERATED += $(OBJDIR)/Timer.o
+GENERATED += $(OBJDIR)/RankingScheduler.o
+GENERATED += $(OBJDIR)/RealTimeTimer.o
 GENERATED += $(OBJDIR)/main.o
+OBJECTS += $(OBJDIR)/Os.o
 OBJECTS += $(OBJDIR)/Process.o
-OBJECTS += $(OBJDIR)/Timer.o
+OBJECTS += $(OBJDIR)/RankingScheduler.o
+OBJECTS += $(OBJDIR)/RealTimeTimer.o
 OBJECTS += $(OBJDIR)/main.o
 
 # Rules
@@ -142,10 +147,16 @@ endif
 # File Rules
 # #############################################
 
+$(OBJDIR)/Os.o: Os.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/Process.o: Process.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/Timer.o: Timer.cpp
+$(OBJDIR)/RankingScheduler.o: RankingScheduler.cpp
+	@echo "$(notdir $<)"
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/RealTimeTimer.o: RealTimeTimer.cpp
 	@echo "$(notdir $<)"
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/main.o: main.cpp
