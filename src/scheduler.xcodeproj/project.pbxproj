@@ -1,0 +1,266 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4EA0A3007F849AF2929CD140 /* Process.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 46BC99286CE2C8DAD3E9BF68 /* Process.cpp */; };
+		5395226AAAFA955C5D08B0AA /* RealTimeTimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D07E62F20277ADA47C56E932 /* RealTimeTimer.cpp */; };
+		7D4934A676AF36186A4A92E6 /* Os.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C326FE6E667287A0814354AE /* Os.cpp */; };
+		89B5A9D44C760A46A9AAE814 /* RankingScheduler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 72B529BC56FC31EEDAE95FFC /* RankingScheduler.cpp */; };
+		B68AC1CC0D182C3EE591400C /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E21F5234E590246666FCC874 /* main.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		04FD3E122B236DC4922A6452 /* Process.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = Process.hpp; path = Process.hpp; sourceTree = "<group>"; };
+		0692B0522ECD69041668F692 /* Scheduler.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = Scheduler.hpp; path = Scheduler.hpp; sourceTree = "<group>"; };
+		186DB4F465D0AB26DBEFAB34 /* ProcessState.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = ProcessState.hpp; path = ProcessState.hpp; sourceTree = "<group>"; };
+		224B9838C597216AE067EE78 /* Os.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = Os.hpp; path = Os.hpp; sourceTree = "<group>"; };
+		40487BD6E336A288725C8216 /* Timer.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = Timer.hpp; path = Timer.hpp; sourceTree = "<group>"; };
+		46BC99286CE2C8DAD3E9BF68 /* Process.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Process.cpp; path = Process.cpp; sourceTree = "<group>"; };
+		4A4FE3E470761396D77D0A24 /* Program.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = Program.hpp; path = Program.hpp; sourceTree = "<group>"; };
+		72B529BC56FC31EEDAE95FFC /* RankingScheduler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = RankingScheduler.cpp; path = RankingScheduler.cpp; sourceTree = "<group>"; };
+		745B227D1749492FA66F28BD /* application */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = application; path = application; sourceTree = BUILT_PRODUCTS_DIR; };
+		84705B8C969A383ECA8B21CC /* ProcessFileParser.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = ProcessFileParser.hpp; path = ProcessFileParser.hpp; sourceTree = "<group>"; };
+		C326FE6E667287A0814354AE /* Os.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Os.cpp; path = Os.cpp; sourceTree = "<group>"; };
+		CE0AE62AF6459EDCDDE12C6A /* MockTimer.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = MockTimer.hpp; path = MockTimer.hpp; sourceTree = "<group>"; };
+		D07E62F20277ADA47C56E932 /* RealTimeTimer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = RealTimeTimer.cpp; path = RealTimeTimer.cpp; sourceTree = "<group>"; };
+		DE6D8F9C1066DA4E8A4615DC /* RealTimeTimer.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = RealTimeTimer.hpp; path = RealTimeTimer.hpp; sourceTree = "<group>"; };
+		E21F5234E590246666FCC874 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = main.cpp; sourceTree = "<group>"; };
+		E44976100A6FA5C271769C50 /* Greeter.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = Greeter.hpp; path = Greeter.hpp; sourceTree = "<group>"; };
+		F3706846D7B770785BA49E86 /* RankingScheduler.hpp */ = {isa = PBXFileReference; lastKnownFileType = text; name = RankingScheduler.hpp; path = RankingScheduler.hpp; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F8ED616D9D3FFF1FAF7847AD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		BF96C119C307934B44743759 /* Embed Libraries */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Libraries";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXGroup section */
+		3727B9DFBA6D1751E3B4981F /* scheduler */ = {
+			isa = PBXGroup;
+			children = (
+				E44976100A6FA5C271769C50 /* Greeter.hpp */,
+				CE0AE62AF6459EDCDDE12C6A /* MockTimer.hpp */,
+				C326FE6E667287A0814354AE /* Os.cpp */,
+				224B9838C597216AE067EE78 /* Os.hpp */,
+				46BC99286CE2C8DAD3E9BF68 /* Process.cpp */,
+				04FD3E122B236DC4922A6452 /* Process.hpp */,
+				84705B8C969A383ECA8B21CC /* ProcessFileParser.hpp */,
+				186DB4F465D0AB26DBEFAB34 /* ProcessState.hpp */,
+				4A4FE3E470761396D77D0A24 /* Program.hpp */,
+				72B529BC56FC31EEDAE95FFC /* RankingScheduler.cpp */,
+				F3706846D7B770785BA49E86 /* RankingScheduler.hpp */,
+				D07E62F20277ADA47C56E932 /* RealTimeTimer.cpp */,
+				DE6D8F9C1066DA4E8A4615DC /* RealTimeTimer.hpp */,
+				0692B0522ECD69041668F692 /* Scheduler.hpp */,
+				40487BD6E336A288725C8216 /* Timer.hpp */,
+				E21F5234E590246666FCC874 /* main.cpp */,
+				A6C936B49B3FADE6EA134CF4 /* Products */,
+			);
+			name = scheduler;
+			sourceTree = "<group>";
+		};
+		A6C936B49B3FADE6EA134CF4 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				745B227D1749492FA66F28BD /* application */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		DEDA1EC350653735FF665D03 /* scheduler */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E728A9CC8B7B477E9DB3900C /* Build configuration list for PBXNativeTarget "scheduler" */;
+			buildPhases = (
+				68D4E20D0D277FBF1F5FC84D /* Resources */,
+				D281FB6476D49916890CE1A4 /* Sources */,
+				F8ED616D9D3FFF1FAF7847AD /* Frameworks */,
+				BF96C119C307934B44743759 /* Embed Libraries */,
+				9607AE3710C85E8F00CD1376 /* Postbuild */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = scheduler;
+			productInstallPath = "$(HOME)/bin";
+			productName = scheduler;
+			productReference = 745B227D1749492FA66F28BD /* application */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "scheduler" */;
+			compatibilityVersion = "Xcode 3.2";
+			hasScannedForEncodings = 1;
+			mainGroup = 3727B9DFBA6D1751E3B4981F /* scheduler */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				DEDA1EC350653735FF665D03 /* application */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		68D4E20D0D277FBF1F5FC84D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		9607AE3710C85E8F00CD1376 /* Postbuild */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = Postbuild;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\nif [ \"${CONFIGURATION}\" = \"debug\" ]; then\n../build/bin/debug/scheduler/application\ncp -f ../build/bin/debug/scheduler/application ../scheduler\nfi";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D281FB6476D49916890CE1A4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7D4934A676AF36186A4A92E6 /* Os.cpp in Sources */,
+				4EA0A3007F849AF2929CD140 /* Process.cpp in Sources */,
+				89B5A9D44C760A46A9AAE814 /* RankingScheduler.cpp in Sources */,
+				5395226AAAFA955C5D08B0AA /* RealTimeTimer.cpp in Sources */,
+				B68AC1CC0D182C3EE591400C /* main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		277AC3282AEB955AAC583968 /* release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				OBJROOT = "../build/bin-obj/release/scheduler";
+				ONLY_ACTIVE_ARCH = NO;
+				SYMROOT = ../build/bin/release/scheduler;
+			};
+			name = release;
+		};
+		4306A82C64D2555EA1877E6C /* release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CONFIGURATION_BUILD_DIR = ../build/bin/release/scheduler;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_DYNAMIC_NO_PIC = NO;
+				INSTALL_PATH = /usr/local/bin;
+				PRODUCT_NAME = application;
+			};
+			name = release;
+		};
+		433A98B26B7551645310DEF2 /* debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CONFIGURATION_BUILD_DIR = ../build/bin/debug/scheduler;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_DYNAMIC_NO_PIC = NO;
+				INSTALL_PATH = /usr/local/bin;
+				PRODUCT_NAME = application;
+			};
+			name = debug;
+		};
+		A1C7D56E461A73205852BBAE /* debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)";
+				CONFIGURATION_TEMP_DIR = "$(OBJROOT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					DEBUG,
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				OBJROOT = "../build/bin-obj/debug/scheduler";
+				ONLY_ACTIVE_ARCH = YES;
+				SYMROOT = ../build/bin/debug/scheduler;
+			};
+			name = debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "scheduler" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1C7D56E461A73205852BBAE /* debug */,
+				277AC3282AEB955AAC583968 /* release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = debug;
+		};
+		E728A9CC8B7B477E9DB3900C /* Build configuration list for PBXNativeTarget "application" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				433A98B26B7551645310DEF2 /* debug */,
+				4306A82C64D2555EA1877E6C /* release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = debug;
+		};
+/* End XCConfigurationList section */
+};
+rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}

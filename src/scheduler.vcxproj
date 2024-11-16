@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="debug|Win32">
+      <Configuration>debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="release|Win32">
+      <Configuration>release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{A4EA0DDC-1055-C252-5993-73F8C53CA0A7}</ProjectGuid>
+    <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>scheduler</RootNamespace>
+    <LatestTargetPlatformVersion>$([Microsoft.Build.Utilities.ToolLocationHelper]::GetLatestSDKTargetPlatformVersion('Windows', '10.0'))</LatestTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>..\build\bin\debug\scheduler\</OutDir>
+    <IntDir>..\build\bin-obj\debug\scheduler\</IntDir>
+    <TargetName>application</TargetName>
+    <TargetExt>.exe</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>..\build\bin\release\scheduler\</OutDir>
+    <IntDir>..\build\bin-obj\release\scheduler\</IntDir>
+    <TargetName>application</TargetName>
+    <TargetExt>.exe</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PostBuildEvent>
+      <Command>../build/bin/debug/scheduler/application.exe
+copy /B /Y ..\build\bin\debug\scheduler\application.exe ..\$(ProjectName)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <StringPooling>true</StringPooling>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="Greeter.hpp" />
+    <ClInclude Include="MockTimer.hpp" />
+    <ClInclude Include="Os.hpp" />
+    <ClInclude Include="Process.hpp" />
+    <ClInclude Include="ProcessFileParser.hpp" />
+    <ClInclude Include="ProcessState.hpp" />
+    <ClInclude Include="Program.hpp" />
+    <ClInclude Include="RankingScheduler.hpp" />
+    <ClInclude Include="RealTimeTimer.hpp" />
+    <ClInclude Include="Scheduler.hpp" />
+    <ClInclude Include="Timer.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Os.cpp" />
+    <ClCompile Include="Process.cpp" />
+    <ClCompile Include="RankingScheduler.cpp" />
+    <ClCompile Include="RealTimeTimer.cpp" />
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

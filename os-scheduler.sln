@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "scheduler", "src\scheduler.vcxproj", "{A4EA0DDC-1055-C252-5993-73F8C53CA0A7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tests", "tests\tests.vcxproj", "{78756B10-E489-93C1-AD0B-372119DF8FF2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		debug|Win32 = debug|Win32
+		release|Win32 = release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A4EA0DDC-1055-C252-5993-73F8C53CA0A7}.debug|Win32.ActiveCfg = debug|Win32
+		{A4EA0DDC-1055-C252-5993-73F8C53CA0A7}.debug|Win32.Build.0 = debug|Win32
+		{A4EA0DDC-1055-C252-5993-73F8C53CA0A7}.release|Win32.ActiveCfg = release|Win32
+		{A4EA0DDC-1055-C252-5993-73F8C53CA0A7}.release|Win32.Build.0 = release|Win32
+		{78756B10-E489-93C1-AD0B-372119DF8FF2}.debug|Win32.ActiveCfg = debug|Win32
+		{78756B10-E489-93C1-AD0B-372119DF8FF2}.debug|Win32.Build.0 = debug|Win32
+		{78756B10-E489-93C1-AD0B-372119DF8FF2}.release|Win32.ActiveCfg = release|Win32
+		{78756B10-E489-93C1-AD0B-372119DF8FF2}.release|Win32.Build.0 = release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
