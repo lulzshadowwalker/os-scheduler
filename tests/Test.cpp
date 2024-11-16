@@ -1,19 +1,20 @@
 #include "Process.hpp"
 #include "ProcessFileParser.hpp"
 #include "ProcessState.hpp"
-#include "Timer.hpp"
+#include "MockTimer.hpp"
 #include <cest>
 
-describe("Application", []() {
+describe("Application", []()
+         {
   it("Timer Device :: starts at 0", []() {
-    Timer timer;
+    MockTimer timer;
     expect(timer.time()).toBe(0);
   });
 
   it("Timer Device :: returns the time in seconds since the timer device has "
      "started",
      []() {
-       Timer timer;
+       MockTimer timer;
        // timer.tick();
        // timer.tick();
        // expect(timer.time()).toBe(2);
@@ -22,7 +23,7 @@ describe("Application", []() {
 
   it("Process :: starts at ProcessState::NEW state", []() {
     Program powerpoint("Powerpoint", 5);
-    Process process(&powerpoint, 5);
+    Process process(&powerpoint, 5, 0);
     expect(process.state()).toBe(ProcessState::NEW);
   });
 
@@ -69,5 +70,4 @@ describe("Application", []() {
 
        //  NOTE: Expected an error to be thrown.
        expect(false).toBe(true);
-     });
-});
+     }); });

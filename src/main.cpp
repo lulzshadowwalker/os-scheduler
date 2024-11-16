@@ -9,13 +9,23 @@
 #include "RealTimeTimer.hpp"
 #include "MockTimer.hpp"
 
-int main()
+int main(const int argc, const char *argv[])
 {
-  std::vector<Process *> processes;
+  std::string filepath = "../in.txt";
+  if (argc > 1)
+  {
+    filepath = argv[1];
+  }
+
+  // check if should use real time timer
+  bool isRealTime = (argc > 2 && std::string(argv[2]) == "--realtime");
+
+  std::vector<Process *>
+      processes;
   try
   {
     ProcessFileParser parser;
-    processes = parser.parse("../assets/samples/in.txt");
+    processes = parser.parse("../in.txt");
   }
   catch (const std::runtime_error &e)
   {
@@ -29,7 +39,11 @@ int main()
   }
 
   // auto timer = new RealTimeTimer();
-  auto timer = new MockTimer();
+  Timer *timer = new MockTimer();
+  if (isRealTime)
+  {
+    timer = new RealTimeTimer();
+  }
 
   auto scheduler = new RankingScheduler(timer);
   Os os(scheduler, timer, processes);
