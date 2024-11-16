@@ -50,7 +50,14 @@ const std::string RankingScheduler::dispatch()
     schedule();
 
   Timestamp responseTime = m_Timer->time();
-  m_CurrentProcess->execute();
+  // m_CurrentProcess->execute();
+
+  //  NOTE: Simulate the processing time
+  for (int i = 0; i < m_CurrentProcess->processingTime(); i++)
+  {
+    m_Timer->tick();
+  }
+
   Timestamp turnaroundTime = m_Timer->diff(m_Timer->time(), m_CurrentProcess->arrivedAt());
   Timestamp delay = m_Timer->diff(m_CurrentProcess->turnaroundTime(), m_CurrentProcess->processingTime());
 

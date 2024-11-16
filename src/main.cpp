@@ -7,6 +7,7 @@
 #include <iostream>
 #include <string>
 #include "RealTimeTimer.hpp"
+#include "MockTimer.hpp"
 
 int main()
 {
@@ -27,7 +28,8 @@ int main()
     return 1;
   }
 
-  auto timer = new RealTimeTimer();
+  // auto timer = new RealTimeTimer();
+  auto timer = new MockTimer();
 
   auto scheduler = new RankingScheduler(timer);
   Os os(scheduler, timer, processes);
