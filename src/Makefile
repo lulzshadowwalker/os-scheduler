@@ -41,21 +41,22 @@ define PRELINKCMDS
 endef
 
 ifeq ($(config),debug)
-TARGETDIR = ../bin/debug/scheduler
+TARGETDIR = ../build/bin/debug/scheduler
 TARGET = $(TARGETDIR)/application
-OBJDIR = ../bin-obj/debug/scheduler
+OBJDIR = ../build/bin-obj/debug/scheduler
 DEFINES += -DDEBUG
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -g
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -g -std=c++14
 define POSTBUILDCMDS
 	@echo Running postbuild commands
-	../bin/debug/scheduler/application
+	../build/bin/debug/scheduler/application
+	cp -f ../build/bin/debug/scheduler/application ../scheduler
 endef
 
 else ifeq ($(config),release)
-TARGETDIR = ../bin/release/scheduler
+TARGETDIR = ../build/bin/release/scheduler
 TARGET = $(TARGETDIR)/application
-OBJDIR = ../bin-obj/release/scheduler
+OBJDIR = ../build/bin-obj/release/scheduler
 DEFINES +=
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O2
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -O2 -std=c++14

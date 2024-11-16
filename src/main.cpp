@@ -11,7 +11,7 @@
 
 int main(const int argc, const char *argv[])
 {
-  std::string filepath = "../in.txt";
+  std::string filepath = "./in.txt";
   if (argc > 1)
   {
     filepath = argv[1];
@@ -25,7 +25,7 @@ int main(const int argc, const char *argv[])
   try
   {
     ProcessFileParser parser;
-    processes = parser.parse("../in.txt");
+    processes = parser.parse(filepath);
   }
   catch (const std::runtime_error &e)
   {

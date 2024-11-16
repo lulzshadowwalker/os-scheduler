@@ -41,27 +41,27 @@ define PRELINKCMDS
 endef
 
 ifeq ($(config),debug)
-TARGETDIR = ../bin/debug/tests
+TARGETDIR = ../build/bin/debug/tests
 TARGET = $(TARGETDIR)/test
-OBJDIR = ../bin-obj/debug/tests
+OBJDIR = ../build/bin-obj/debug/tests
 DEFINES += -DDEBUG
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -g
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -g -std=c++14
 define POSTBUILDCMDS
 	@echo Running postbuild commands
-	../bin/debug/tests/test
+	../build/bin/debug/tests/test
 endef
 
 else ifeq ($(config),release)
-TARGETDIR = ../bin/release/tests
+TARGETDIR = ../build/bin/release/tests
 TARGET = $(TARGETDIR)/test
-OBJDIR = ../bin-obj/release/tests
+OBJDIR = ../build/bin-obj/release/tests
 DEFINES +=
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O2
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -O2 -std=c++14
 define POSTBUILDCMDS
 	@echo Running postbuild commands
-	../bin/release/tests/test
+	../build/bin/release/tests/test
 endef
 
 endif

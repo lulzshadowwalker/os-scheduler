@@ -46,6 +46,7 @@ public:
       auto program = new Program(name, processingTime);
       auto process = new Process(program, lineNumber, rank);
       process->setArrivedAt(arrivalTime);
+      process->setId(id);
 
       processes.push_back(process);
     }

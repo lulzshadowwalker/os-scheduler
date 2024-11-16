@@ -53,6 +53,13 @@ public:
     return *this;
   }
 
+  inline Process &setId(int id)
+  {
+    m_Id = id;
+
+    return *this;
+  }
+
   void execute();
 
   bool operator<(const Process &other) const;
