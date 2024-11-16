@@ -91,7 +91,7 @@ const std::string RankingScheduler::dispatch()
   std::ostringstream result;
   result << m_CurrentProcess->name() << ": (response=" << responseTime
          << ", turnaround=" << turnaroundTime
-         << ", delay=" << delay << ")" << " rank=" << m_CurrentProcess->rank() << std::endl << " Arrived at: " << m_CurrentProcess->arrivedAt() << std::endl;
+         << ", delay=" << delay << ")";
 
   m_Processes.erase(
       std::remove(

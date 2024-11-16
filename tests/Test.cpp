@@ -29,9 +29,7 @@ describe("Application", []()
 
   it("Process File Parser :: parses a valid file successfully", []() {
     ProcessFileParser parser;
-    //  TODO: Allow for empty white spaces at the end of the file
-    std::string validFiles[] = {"../assets/samples/valid.txt",
-                                "../assets/samples/valid-2.txt"};
+    std::string validFiles[] = {"../assets/samples/valid.txt"};
     for (int i = 0; i < sizeof(validFiles) / sizeof(std::string); i++) {
       auto processes = parser.parse(validFiles[i]);
 

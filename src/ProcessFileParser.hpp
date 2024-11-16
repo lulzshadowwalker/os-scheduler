@@ -23,14 +23,17 @@ public:
 
     //  NOTE: Ignores the first line if it exists which indicates the total
     //  number of processes in the file
+      int totalProcesses = 0; 
     if (std::getline(inputFile, line)) {
       if (!isNumber(line)) {
-        inputFile.seekg(0);
+        throw std::runtime_error("Invalid format on line 1: " + line + " (expected a number)");
       }
+
+      totalProcesses = std::stoi(line);
     }
 
     int lineNumber = 0;
-    while (std::getline(inputFile, line)) {
+    while (std::getline(inputFile, line) && lineNumber < totalProcesses) {
       lineNumber++;
       std::istringstream lineStream(line);
 
