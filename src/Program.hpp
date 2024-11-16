@@ -5,7 +5,8 @@
 
 using Time = int;
 
-class Program {
+class Program
+{
 public:
   Program(std::string name, Time processingTime)
       : m_Name(name), m_ProcessingTime(processingTime) {};

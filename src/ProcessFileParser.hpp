@@ -10,11 +10,14 @@
 #include <string>
 #include <vector>
 
-class ProcessFileParser {
+class ProcessFileParser
+{
 public:
-  std::vector<Process *> parse(const std::string &filepath) {
+  std::vector<Process *> parse(const std::string &filepath)
+  {
     std::ifstream inputFile(filepath);
-    if (!inputFile) {
+    if (!inputFile)
+    {
       throw std::runtime_error("Error: Unable to open the file: " + filepath);
     }
 
@@ -23,9 +26,11 @@ public:
 
     //  NOTE: Ignores the first line if it exists which indicates the total
     //  number of processes in the file
-      int totalProcesses = 0; 
-    if (std::getline(inputFile, line)) {
-      if (!isNumber(line)) {
+    int totalProcesses = 0;
+    if (std::getline(inputFile, line))
+    {
+      if (!isNumber(line))
+      {
         throw std::runtime_error("Invalid format on line 1: " + line + " (expected a number)");
       }
 
@@ -33,14 +38,16 @@ public:
     }
 
     int lineNumber = 0;
-    while (std::getline(inputFile, line) && lineNumber < totalProcesses) {
+    while (std::getline(inputFile, line) && lineNumber < totalProcesses)
+    {
       lineNumber++;
       std::istringstream lineStream(line);
 
       std::string name;
       int arrivalTime, processingTime, rank;
 
-      if (!(lineStream >> name >> arrivalTime >> processingTime >> rank)) {
+      if (!(lineStream >> name >> arrivalTime >> processingTime >> rank))
+      {
         throw std::runtime_error("Invalid format on line " +
                                  std::to_string(lineNumber) + ": " + line);
       }
@@ -60,7 +67,8 @@ public:
 private:
   std::string m_FilePath;
 
-  static bool isNumber(const std::string &str) {
+  static bool isNumber(const std::string &str)
+  {
     return !str.empty() && std::all_of(str.begin(), str.end(), ::isdigit);
   }
 };

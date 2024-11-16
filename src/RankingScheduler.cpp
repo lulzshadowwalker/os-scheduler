@@ -26,30 +26,41 @@ void RankingScheduler::admit(Process *process)
   markAsDirty();
 }
 
-void bubbleSort(std::vector<Process *>& processes) {
-    for (size_t i = 0; i < processes.size(); ++i) {
-        for (size_t j = 0; j < processes.size() - i - 1; ++j) {
-            Process*& a = processes[j];
-            Process*& b = processes[j + 1];
+void bubbleSort(std::vector<Process *> &processes)
+{
+  for (size_t i = 0; i < processes.size(); ++i)
+  {
+    for (size_t j = 0; j < processes.size() - i - 1; ++j)
+    {
+      Process *&a = processes[j];
+      Process *&b = processes[j + 1];
 
-            bool shouldSwap = false;
-            if (a->rank() < b->rank()) {
-                shouldSwap = true; 
-            } else if (a->rank() == b->rank()) {
-                if (a->arrivedAt() > b->arrivedAt()) {
-                    shouldSwap = true; 
-                } else if (a->arrivedAt() == b->arrivedAt()) {
-                    if (a->id() > b->id()) {
-                        shouldSwap = true; 
-                    }
-                }
-            }
-
-            if (shouldSwap) {
-                std::swap(processes[j], processes[j + 1]);
-            }
+      bool shouldSwap = false;
+      if (a->rank() < b->rank())
+      {
+        shouldSwap = true;
+      }
+      else if (a->rank() == b->rank())
+      {
+        if (a->arrivedAt() > b->arrivedAt())
+        {
+          shouldSwap = true;
         }
+        else if (a->arrivedAt() == b->arrivedAt())
+        {
+          if (a->id() > b->id())
+          {
+            shouldSwap = true;
+          }
+        }
+      }
+
+      if (shouldSwap)
+      {
+        std::swap(processes[j], processes[j + 1]);
+      }
     }
+  }
 }
 
 void RankingScheduler::schedule()
